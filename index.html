@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multivariable Calculus for AI · Flashcards</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,800;1,400&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #16151a;
+    --bg-soft: #1f1d24;
+    --paper: #f4f1ea;
+    --ink: #16151a;
+    --ink-soft: #3a3742;
+    --muted: #8a8390;
+    --accent: #ff6b35;
+    --accent-soft: #ffe5d6;
+    --blue: #6ea8ff;
+    --green: #6dd49a;
+    --red: #ff7b7b;
+    --rule: rgba(255,255,255,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: var(--bg);
+    color: var(--paper);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 48px;
+    background-image:
+      radial-gradient(circle at 80% 0%, rgba(255,107,53,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 0% 100%, rgba(110,168,255,0.06) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  /* Header */
+  header {
+    width: 100%;
+    max-width: 620px;
+    margin-bottom: 28px;
+  }
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .top-row .accent { color: var(--accent); }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 2.4rem;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    margin-bottom: 6px;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .subtitle {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  /* Filter chips */
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin: 22px 0 18px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    padding: 6px 14px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--paper);
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  /* Progress */
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .progress-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .progress-text .now { color: var(--accent); font-weight: 500; }
+
+  .progress-bar {
+    flex: 1;
+    margin: 0 16px;
+    height: 3px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #ff9466);
+    transition: width 0.4s ease;
+  }
+
+  /* Card */
+  .scene {
+    width: 100%;
+    max-width: 620px;
+    height: 380px;
+    perspective: 1400px;
+    cursor: pointer;
+    margin-bottom: 22px;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 14px;
+    padding: 36px 38px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.2);
+    overflow: hidden;
+  }
+
+  /* FRONT */
+  .card-front {
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid #d4cfc0;
+  }
+  .card-front::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle at top right, var(--accent-soft) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .topic-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .topic-tag::before {
+    content: '§ ';
+    color: var(--ink-soft);
+  }
+
+  .question {
+    font-family: 'Fraunces', serif;
+    font-size: 1.55rem;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* BACK */
+  .card-back {
+    background: var(--bg-soft);
+    color: var(--paper);
+    transform: rotateY(180deg);
+    border: 1px solid var(--rule);
+    overflow-y: auto;
+  }
+  .card-back::-webkit-scrollbar { width: 4px; }
+  .card-back::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+
+  .answer-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .answer-tag::before {
+    content: '↳ ';
+  }
+
+  .answer-text {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--paper);
+    flex: 1;
+  }
+  .answer-text strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .answer-text em {
+    font-style: italic;
+    color: var(--blue);
+  }
+
+  .formula {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255,107,53,0.08);
+    border-left: 2px solid var(--accent);
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.86rem;
+    color: var(--paper);
+    line-height: 1.7;
+  }
+
+  .ai-tag {
+    display: inline-block;
+    background: var(--blue);
+    color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.12em;
+    margin: 12px 0 6px;
+  }
+  .ai-block {
+    font-size: 0.88rem;
+    color: rgba(244,241,234,0.85);
+    line-height: 1.6;
+    border-left: 2px solid var(--blue);
+    padding-left: 12px;
+    margin-top: 4px;
+  }
+
+  /* Tap hint */
+  .tap-hint {
+    position: absolute;
+    bottom: 14px;
+    right: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  /* Rating buttons */
+  .controls {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 620px;
+    margin-bottom: 16px;
+  }
+  .answer-btns { display: none; }
+  .answer-btns.visible { display: flex; }
+
+  .btn {
+    flex: 1;
+    padding: 13px 16px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--paper);
+    border-radius: 10px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.02em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .btn .key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    opacity: 0.5;
+    letter-spacing: 0.08em;
+  }
+  .btn:hover { transform: translateY(-2px); }
+
+  .btn-again:hover { border-color: var(--red); color: var(--red); }
+  .btn-hard:hover { border-color: #ffb74d; color: #ffb74d; }
+  .btn-good:hover { border-color: var(--green); color: var(--green); }
+  .btn-easy:hover { border-color: var(--blue); color: var(--blue); }
+
+  /* Nav */
+  .nav-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 620px;
+    justify-content: center;
+  }
+  .nav-btn {
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    padding: 8px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .card-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Done screen */
+  .done-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    max-width: 620px;
+    width: 100%;
+    text-align: center;
+    padding: 48px 28px;
+    background: var(--bg-soft);
+    border-radius: 14px;
+    border: 1px solid var(--rule);
+  }
+  .done-screen h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+  .done-screen h2 em { color: var(--accent); font-style: italic; }
+  .done-screen p {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .restart-btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 12px;
+    letter-spacing: 0.02em;
+  }
+  .score-row {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    margin: 12px 0;
+  }
+  .score-item { text-align: center; }
+  .score-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+  .score-num.red { color: var(--red); }
+  .score-num.green { color: var(--green); }
+  .score-num.blue { color: var(--blue); }
+  .score-lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  @media (max-width: 640px) {
+    .card-face { padding: 26px 24px; }
+    .question { font-size: 1.25rem; }
+    .scene { height: 420px; }
+    .btn { font-size: 0.76rem; padding: 11px 8px; }
+    .filters { font-size: 0.68rem; }
+    .chip { padding: 5px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-row">
+    <span>Week 01 <span class="accent">●</span> Day 1–2</span>
+    <span>21 cards</span>
+  </div>
+  <h1>Multivariable<br>Calculus, <em>for AI</em>.</h1>
+  <p class="subtitle">Spaced-repetition deck. Tap to flip.</p>
+
+  <div class="filters" id="filters">
+    <button class="chip active" data-topic="all">All</button>
+    <button class="chip" data-topic="Partial Derivatives">Partials</button>
+    <button class="chip" data-topic="Gradient">Gradient</button>
+    <button class="chip" data-topic="Directional">Directional</button>
+    <button class="chip" data-topic="Hessian">Hessian</button>
+    <button class="chip" data-topic="Taylor">Taylor</button>
+    <button class="chip" data-topic="Jacobian">Jacobian</button>
+  </div>
+
+  <div class="progress-row">
+    <span class="progress-text"><span class="now" id="cur">01</span> / <span id="tot">21</span></span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:5%"></div></div>
+  </div>
+</header>
+
+<!-- Card -->
+<div class="scene" id="scene" onclick="flipCard()">
+  <div class="card" id="card">
+    <div class="card-face card-front">
+      <div class="topic-tag" id="topicTag"></div>
+      <div class="question" id="questionText"></div>
+      <div class="card-meta">
+        <span id="cardId">Card 01</span>
+        <span>Tap to reveal</span>
+      </div>
+    </div>
+    <div class="card-face card-back">
+      <div class="answer-tag">Answer</div>
+      <div class="answer-text" id="answerText"></div>
+      <span class="tap-hint">tap to flip back</span>
+    </div>
+  </div>
+</div>
+
+<!-- Rating buttons -->
+<div class="controls answer-btns" id="answerBtns">
+  <button class="btn btn-again" onclick="rate('again')">Again<span class="key">1</span></button>
+  <button class="btn btn-hard" onclick="rate('hard')">Hard<span class="key">2</span></button>
+  <button class="btn btn-good" onclick="rate('good')">Good<span class="key">3</span></button>
+  <button class="btn btn-easy" onclick="rate('easy')">Easy<span class="key">4</span></button>
+</div>
+
+<!-- Nav -->
+<div class="nav-row" id="navRow">
+  <button class="nav-btn" onclick="prevCard()">← prev</button>
+  <span class="card-counter" id="cardCounter">Card 1 / 21</span>
+  <button class="nav-btn" onclick="nextCard()">next →</button>
+</div>
+
+<!-- Done screen -->
+<div class="done-screen" id="doneScreen">
+  <h2>Deck <em>complete</em></h2>
+  <div class="score-row">
+    <div class="score-item">
+      <div class="score-num green" id="goodCount">0</div>
+      <div class="score-lbl">Good / Easy</div>
+    </div>
+    <div class="score-item">
+      <div class="score-num blue" id="hardCount">0</div>
+      <div class="score-lbl">Hard</div>
+    </div>
+    <div class="score-item">
+      <div class="score-num red" id="againCount">0</div>
+      <div class="score-lbl">Again</div>
+    </div>
+  </div>
+  <p>21 cards reviewed across 7 topics.<br>Time to revisit the notes for any "Again" cards.</p>
+  <button class="restart-btn" onclick="restart()">Restart Deck</button>
+</div>
+
+<script>
+const cards = [
+  // ----- PARTIAL DERIVATIVES -----
+  {
+    topic: "Partial Derivatives",
+    q: "What is a partial derivative ∂f/∂xᵢ?",
+    a: "The rate of change of f when only <strong>xᵢ varies</strong> and all other variables are held constant. It's the slope of f along a single coordinate axis.<br><br>For f(x,y,z), three partials: ∂f/∂x, ∂f/∂y, ∂f/∂z."
+  },
+  {
+    topic: "Partial Derivatives",
+    q: "Compute ∂f/∂x and ∂f/∂y for f(x, y) = x²y + 3y² + xy.",
+    a: "<span class='formula'>∂f/∂x = 2xy + y    (treat y as constant)<br>∂f/∂y = x² + 6y + x  (treat x as constant)</span>"
+  },
+  {
+    topic: "Partial Derivatives",
+    q: "How are partial derivatives the foundation of backpropagation?",
+    a: "A neural network's loss L is a function of millions of weights w₁…wₙ. To update each weight via SGD, we need <strong>∂L/∂wᵢ</strong> — exactly a partial derivative.<br><br><span class='ai-tag'>AI / ML</span><div class='ai-block'>Backprop is just the chain rule applied to compute these partials efficiently across a computation graph. PyTorch's <code>autograd</code> and JAX's <code>grad</code> are partial-derivative engines.</div>"
+  },
+
+  // ----- GRADIENT -----
+  {
+    topic: "Gradient",
+    q: "What is the gradient ∇f and what does it represent geometrically?",
+    a: "The gradient is the <strong>vector of all partial derivatives</strong>:<span class='formula'>∇f = [∂f/∂x₁, ∂f/∂x₂, …, ∂f/∂xₙ]ᵀ</span>It points in the direction of <em>steepest ascent</em>; its magnitude ‖∇f‖ is how steep that ascent is."
+  },
+  {
+    topic: "Gradient",
+    q: "Why do we move in the direction of −∇f to minimize a function?",
+    a: "Because ∇f points toward maximum increase, <strong>−∇f points toward maximum decrease</strong>. Stepping along −∇f reduces f as fast as possible per unit step.<br><br>This is the core of gradient descent:<span class='formula'>w<sub>t+1</sub> = w<sub>t</sub> − η · ∇L(w<sub>t</sub>)</span>"
+  },
+  {
+    topic: "Gradient",
+    q: "What is special about a point where ∇f = 0?",
+    a: "It's a <strong>critical point</strong> — could be a local minimum, local maximum, or saddle point. The gradient alone can't distinguish; you need the <em>Hessian</em> to classify it."
+  },
+  {
+    topic: "Gradient",
+    q: "Name three deep learning optimizers built on gradient descent.",
+    a: "<strong>SGD, Adam, RMSProp, AdamW, Adagrad, Lion</strong> — all start from the same skeleton w ← w − η·∇L. They differ in how they scale, smooth, or accumulate gradients (momentum, adaptive rates, bias correction).<br><br><span class='ai-tag'>AI / ML</span><div class='ai-block'>Every optimizer in PyTorch's <code>torch.optim</code> module is a gradient descent variant.</div>"
+  },
+
+  // ----- DIRECTIONAL -----
+  {
+    topic: "Directional",
+    q: "Define the directional derivative D<sub>u</sub>f(x) for a unit vector u.",
+    a: "The rate of change of f at point x in direction u:<span class='formula'>D<sub>u</sub>f(x) = ∇f(x) · u = ‖∇f‖ · cos(θ)</span>where θ is the angle between ∇f and u."
+  },
+  {
+    topic: "Directional",
+    q: "When is the directional derivative maximized? Minimized? Zero?",
+    a: "• <strong>Maximized</strong> when u aligns with ∇f (θ=0°, cos=1) → steepest ascent.<br>• <strong>Minimized</strong> when u is opposite ∇f (θ=180°, cos=−1) → steepest descent.<br>• <strong>Zero</strong> when u is perpendicular to ∇f (θ=90°) → moving along a contour line, no change in f."
+  },
+  {
+    topic: "Directional",
+    q: "How are directional derivatives used in adversarial ML attacks?",
+    a: "<span class='ai-tag'>AI / ML</span><div class='ai-block'>The <strong>Fast Gradient Sign Method (FGSM)</strong> perturbs an input in the direction that maximally increases loss:<span class='formula'>x<sub>adv</sub> = x + ε · sign(∇<sub>x</sub> L(θ, x, y))</span>This is literally taking the directional derivative direction that maximizes the loss — fooling the model with a tiny input change.</div>"
+  },
+
+  // ----- HESSIAN -----
+  {
+    topic: "Hessian",
+    q: "What is the Hessian matrix H and what is its shape for f: ℝⁿ → ℝ?",
+    a: "The matrix of <strong>all second partial derivatives</strong>; shape <strong>n × n</strong>:<span class='formula'>H<sub>ij</sub> = ∂²f / ∂xᵢ∂xⱼ</span>It captures the <em>curvature</em> of f. By Schwarz's theorem, H is symmetric when second partials are continuous."
+  },
+  {
+    topic: "Hessian",
+    q: "Why is the Hessian symmetric (H<sub>ij</sub> = H<sub>ji</sub>)?",
+    a: "By <strong>Schwarz's theorem</strong> (Clairaut's theorem): if the second partial derivatives are continuous, the order of differentiation doesn't matter:<span class='formula'>∂²f/∂x∂y = ∂²f/∂y∂x</span>"
+  },
+  {
+    topic: "Hessian",
+    q: "What do the eigenvalues of the Hessian tell you about the loss landscape geometry?",
+    a: "They give the <strong>curvatures along principal axes</strong>:<br>• All positive → bowl (local min)<br>• All negative → upside-down bowl (local max)<br>• Mixed signs → saddle point<br>• Some zero → flat directions, inconclusive<br><br><span class='ai-tag'>AI / ML</span><div class='ai-block'>The eigenspectrum near a minimum determines <em>sharpness vs flatness</em> — and flat minima are widely believed to generalize better.</div>"
+  },
+  {
+    topic: "Hessian",
+    q: "What is Newton's method and how does it use the Hessian?",
+    a: "Second-order optimization that uses curvature to take smarter steps:<span class='formula'>w<sub>t+1</sub> = w<sub>t</sub> − H⁻¹ · ∇L(w<sub>t</sub>)</span><span class='ai-tag'>AI / ML</span><div class='ai-block'>Pure Newton is impractical for big nets (H is huge), so approximations like <strong>K-FAC, Shampoo, and Sophia</strong> approximate H⁻¹ with structured factorizations.</div>"
+  },
+
+  // ----- SECOND-ORDER -----
+  {
+    topic: "Hessian",
+    q: "At a critical point ∇f(x*) = 0, how do you classify it as min / max / saddle?",
+    a: "Apply the <strong>second-order conditions</strong> using Hessian H(x*):<br>• H positive definite (all eigenvalues > 0) → <strong>local min</strong><br>• H negative definite (all < 0) → <strong>local max</strong><br>• H indefinite (mixed signs) → <strong>saddle</strong><br>• H semidefinite (some zero) → inconclusive"
+  },
+  {
+    topic: "Hessian",
+    q: "For 2D f(x,y), what is the discriminant test? What does D = f<sub>xx</sub>·f<sub>yy</sub> − (f<sub>xy</sub>)² mean?",
+    a: "At critical point:<br>• <strong>D > 0 and f<sub>xx</sub> > 0</strong> → local min<br>• <strong>D > 0 and f<sub>xx</sub> < 0</strong> → local max<br>• <strong>D < 0</strong> → saddle point<br>• <strong>D = 0</strong> → inconclusive<br><br>This is just the Hessian's determinant + leading principal minor for 2D."
+  },
+  {
+    topic: "Hessian",
+    q: "Why are saddle points (not minima) the dominant problem in deep learning?",
+    a: "<span class='ai-tag'>AI / ML</span><div class='ai-block'>In high-dim parameter spaces, the probability that all Hessian eigenvalues are the same sign at a critical point shrinks exponentially with dimension. So <strong>saddles vastly outnumber true minima</strong>.<br><br>SGD's stochastic noise is essentially an escape mechanism — the random perturbations push the optimizer off saddle ridges in negative-curvature directions.</div>"
+  },
+
+  // ----- TAYLOR -----
+  {
+    topic: "Taylor",
+    q: "Write the second-order multivariate Taylor expansion of f around point a, with Δx = x − a.",
+    a: "<span class='formula'>f(x) ≈ f(a) + ∇f(a)ᵀ Δx + ½ Δxᵀ H(a) Δx + O(‖Δx‖³)</span>Three terms: <strong>constant</strong> (anchor value), <strong>linear</strong> (slope correction), <strong>quadratic</strong> (curvature correction)."
+  },
+  {
+    topic: "Taylor",
+    q: "How do gradient descent and Newton's method correspond to truncations of the Taylor expansion?",
+    a: "• <strong>Gradient descent</strong> uses only the <em>linear (1st-order)</em> term — picks descent direction.<br>• <strong>Newton's method</strong> uses the full <em>quadratic (2nd-order)</em> term — jumps to the minimum of the local parabola: Δx* = −H⁻¹∇f.<br><br>Trust region methods constrain how far you trust the quadratic approximation."
+  },
+  {
+    topic: "Taylor",
+    q: "How does Taylor expansion appear in Sharpness-Aware Minimization (SAM) and EWC?",
+    a: "<span class='ai-tag'>AI / ML</span><div class='ai-block'><strong>SAM:</strong> the 2nd-order term ½Δwᵀ H Δw is exactly what 'sharpness' measures. SAM optimizes a worst-case loss in a neighborhood — penalizing sharp Taylor curvature.<br><br><strong>EWC (Elastic Weight Consolidation):</strong> Taylor-approximates loss around old weights to add a quadratic penalty using the Fisher information (Hessian-like) — preventing catastrophic forgetting.</div>"
+  },
+
+  // ----- JACOBIAN -----
+  {
+    topic: "Jacobian",
+    q: "What is the Jacobian matrix and when do you need it instead of a gradient?",
+    a: "The Jacobian generalizes the gradient to <strong>vector-valued functions f: ℝⁿ → ℝᵐ</strong>. It's the m×n matrix:<span class='formula'>J<sub>ij</sub> = ∂f<sub>i</sub> / ∂x<sub>j</sub></span>You need it whenever the output is a vector — i.e., every neural network layer. When m=1, the Jacobian becomes the gradient (transposed)."
+  },
+  {
+    topic: "Jacobian",
+    q: "State the multivariable chain rule using Jacobians and connect it to backpropagation.",
+    a: "If y = f(g(x)):<span class='formula'>∂y/∂x = J<sub>f</sub>(g(x)) · J<sub>g</sub>(x)</span><span class='ai-tag'>AI / ML</span><div class='ai-block'>Backprop is exactly this chain rule, applied across stacked layers. Each layer's Jacobian is multiplied with the next as gradients flow backward. <strong>Vanishing/exploding gradients</strong> happen when this product of Jacobian norms shrinks to 0 or blows up.</div>"
+  },
+  {
+    topic: "Jacobian",
+    q: "How are Jacobians used in normalizing flows like RealNVP / Glow?",
+    a: "<span class='ai-tag'>AI / ML</span><div class='ai-block'>Normalizing flows transform a simple distribution to a complex one via an invertible function. The change-of-variables formula requires <strong>log|det J|</strong> of the transformation:<span class='formula'>log p(x) = log p(z) − log|det J|</span>The Jacobian determinant tells you how the model stretches or compresses probability density.</div>"
+  }
+];
+
+let pool = [...cards];
+let current = 0;
+let isFlipped = false;
+let scores = { again: 0, hard: 0, good: 0, easy: 0 };
+let activeTopic = "all";
+
+function applyFilter() {
+  pool = activeTopic === "all"
+    ? [...cards]
+    : cards.filter(c => c.topic === activeTopic);
+  current = 0;
+  document.getElementById('tot').textContent = String(pool.length).padStart(2, '0');
+  document.getElementById('scene').style.display = '';
+  document.getElementById('navRow').style.display = '';
+  document.getElementById('doneScreen').style.display = 'none';
+  document.getElementById('answerBtns').classList.remove('visible');
+  render();
+}
+
+function render() {
+  if (pool.length === 0) return;
+  const c = pool[current];
+  document.getElementById('topicTag').textContent = c.topic;
+  document.getElementById('questionText').innerHTML = c.q;
+  document.getElementById('answerText').innerHTML = c.a;
+  document.getElementById('cardId').textContent = `Card ${String(current+1).padStart(2,'0')}`;
+
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('answerBtns').classList.remove('visible');
+
+  const pct = ((current + 1) / pool.length * 100).toFixed(0);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('cur').textContent = String(current+1).padStart(2, '0');
+  document.getElementById('cardCounter').textContent = `Card ${current+1} / ${pool.length}`;
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('card').classList.toggle('flipped', isFlipped);
+  if (isFlipped) {
+    document.getElementById('answerBtns').classList.add('visible');
+  } else {
+    document.getElementById('answerBtns').classList.remove('visible');
+  }
+}
+
+function rate(val) {
+  scores[val]++;
+  nextCard();
+}
+
+function nextCard() {
+  if (current < pool.length - 1) {
+    current++;
+    render();
+  } else {
+    showDone();
+  }
+}
+
+function prevCard() {
+  if (current > 0) { current--; render(); }
+}
+
+function showDone() {
+  document.getElementById('scene').style.display = 'none';
+  document.getElementById('answerBtns').classList.remove('visible');
+  document.getElementById('navRow').style.display = 'none';
+  document.getElementById('doneScreen').style.display = 'flex';
+  document.getElementById('goodCount').textContent = scores.good + scores.easy;
+  document.getElementById('hardCount').textContent = scores.hard;
+  document.getElementById('againCount').textContent = scores.again;
+}
+
+function restart() {
+  scores = { again: 0, hard: 0, good: 0, easy: 0 };
+  applyFilter();
+}
+
+// Filters
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeTopic = chip.dataset.topic;
+    applyFilter();
+  });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === 'ArrowLeft') prevCard();
+  else if (isFlipped) {
+    if (e.key === '1') rate('again');
+    else if (e.key === '2') rate('hard');
+    else if (e.key === '3') rate('good');
+    else if (e.key === '4') rate('easy');
+  }
+});
+
+applyFilter();
+</script>
+</body>
+</html>
