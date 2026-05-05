@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multivariable Calculus for AI · Week 1 Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --bg-warm: #ede6d6;
+    --ink: #16151a;
+    --ink-soft: #3a3742;
+    --muted: #8a8390;
+    --accent: #d94a1f;
+    --accent-deep: #9c2d0e;
+    --accent-soft: #fce4d8;
+    --blue: #1e3a8a;
+    --blue-soft: #dde5ff;
+    --green: #2d6a3f;
+    --green-soft: #d8ecdc;
+    --rule: #cbc4b4;
+    --code-bg: #1a1820;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    background-image:
+      radial-gradient(circle at 8% 0%, #f9e7d6 0%, transparent 30%),
+      radial-gradient(circle at 95% 100%, #e2dccc 0%, transparent 35%);
+    background-attachment: fixed;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 60px 32px 120px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Header / title */
+  .masthead {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 32px;
+    margin-bottom: 56px;
+  }
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .top-row .dot { color: var(--accent); }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    margin-bottom: 18px;
+  }
+  h1.title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .subtitle {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    max-width: 620px;
+  }
+
+  /* Table of contents */
+  .toc {
+    background: var(--bg-warm);
+    border: 1.5px solid var(--rule);
+    border-radius: 4px;
+    padding: 24px 28px;
+    margin-bottom: 80px;
+  }
+  .toc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    padding: 7px 0;
+    border-bottom: 1px dotted var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .toc li:last-child { border-bottom: none; }
+  .toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .toc a {
+    color: var(--ink);
+    text-decoration: none;
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    flex: 1;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc .toc-page {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  /* Section */
+  section {
+    margin-bottom: 90px;
+    scroll-margin-top: 32px;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: inline-block;
+    padding: 4px 10px;
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  h2 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--ink-soft);
+    margin-bottom: 32px;
+    padding-left: 20px;
+    border-left: 3px solid var(--accent);
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 36px 0 14px;
+    letter-spacing: -0.01em;
+  }
+  h3::before {
+    content: '§ ';
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  h4 {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin: 28px 0 10px;
+  }
+
+  p { margin-bottom: 18px; font-size: 1.02rem; color: var(--ink-soft); }
+  p strong { color: var(--ink); font-weight: 600; }
+
+  ul, ol { margin: 14px 0 22px 22px; }
+  ul li, ol li { margin-bottom: 8px; color: var(--ink-soft); font-size: 1rem; }
+  ul li::marker { color: var(--accent); }
+
+  /* Math block */
+  .math {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg-warm);
+    border-left: 3px solid var(--accent);
+    padding: 18px 22px;
+    margin: 20px 0;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--ink);
+    overflow-x: auto;
+    border-radius: 0 4px 4px 0;
+  }
+  .math .lbl {
+    display: block;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  code.inline {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg-warm);
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: var(--accent-deep);
+    border: 1px solid var(--rule);
+  }
+
+  /* Code block */
+  .code-block {
+    background: var(--code-bg);
+    color: #e6e3ed;
+    padding: 22px 24px;
+    border-radius: 6px;
+    margin: 22px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 0.65rem;
+    color: #6e6877;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .code-block .kw { color: #c39cf0; }
+  .code-block .fn { color: #ffb86c; }
+  .code-block .str { color: #95e6a8; }
+  .code-block .com { color: #6e6877; font-style: italic; }
+  .code-block .num { color: #ffd479; }
+
+  /* AI callout box */
+  .ai-callout {
+    background: linear-gradient(180deg, var(--blue-soft) 0%, #e8eeff 100%);
+    border: 1.5px solid var(--blue);
+    border-radius: 6px;
+    padding: 22px 26px;
+    margin: 26px 0;
+    position: relative;
+  }
+  .ai-callout::before {
+    content: 'AI / ML';
+    position: absolute;
+    top: -10px;
+    left: 18px;
+    background: var(--blue);
+    color: #fff;
+    padding: 2px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    border-radius: 2px;
+  }
+  .ai-callout h5 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--blue);
+    margin-bottom: 10px;
+    margin-top: 4px;
+  }
+  .ai-callout p {
+    color: var(--ink);
+    font-size: 0.96rem;
+    margin-bottom: 8px;
+  }
+  .ai-callout p:last-child { margin-bottom: 0; }
+
+  /* Intuition box */
+  .intuition {
+    background: var(--green-soft);
+    border-left: 3px solid var(--green);
+    padding: 16px 20px;
+    margin: 22px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .intuition .icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--green);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .intuition p { font-size: 0.96rem; color: var(--ink); margin-bottom: 6px; }
+  .intuition p:last-child { margin-bottom: 0; }
+
+  /* Diagrams */
+  .diagram-frame {
+    background: #fff;
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    padding: 24px;
+    margin: 28px 0;
+    text-align: center;
+  }
+  .diagram-caption {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dotted var(--rule);
+  }
+
+  svg { max-width: 100%; height: auto; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 0.92rem;
+  }
+  th {
+    background: var(--ink);
+    color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 12px 14px;
+    text-align: left;
+  }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-soft);
+    vertical-align: top;
+  }
+  tr:hover td { background: var(--bg-warm); }
+
+  /* Drop cap on first paragraph of each section */
+  section > p.lede + p:first-of-type::first-letter,
+  section > h3 + p:first-of-type::first-letter {
+    /* skip - too noisy */
+  }
+
+  /* Pull quote */
+  .pull-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.6rem;
+    line-height: 1.3;
+    color: var(--ink);
+    margin: 36px 0;
+    padding: 0 36px;
+    text-align: center;
+    position: relative;
+  }
+  .pull-quote::before, .pull-quote::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    background: var(--accent);
+    margin: 18px auto;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 2px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .container { padding: 36px 20px 80px; }
+    .top-row { flex-direction: column; gap: 6px; }
+    table { font-size: 0.84rem; }
+    th, td { padding: 8px 10px; }
+    .pull-quote { padding: 0 12px; font-size: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="top-row">
+      <span>Week 01 <span class="dot">●</span> Day 1–2</span>
+      <span>Google Prep · Calculus Track</span>
+      <span>v1.0</span>
+    </div>
+    <h1 class="title">Multivariable<br><em>Calculus</em>,<br>for AI.</h1>
+    <p class="subtitle">Partial derivatives, gradients, Hessians, Taylor expansions, and Jacobians — translated into the language of neural networks, optimizers, and loss landscapes.</p>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#partials">Partial Derivatives</a><span class="toc-page">§01</span></li>
+      <li><a href="#gradient">The Gradient Vector</a><span class="toc-page">§02</span></li>
+      <li><a href="#directional">Directional Derivatives</a><span class="toc-page">§03</span></li>
+      <li><a href="#hessian">The Hessian Matrix</a><span class="toc-page">§04</span></li>
+      <li><a href="#second-order">Second-Order Conditions</a><span class="toc-page">§05</span></li>
+      <li><a href="#taylor">Taylor Expansion in Multiple Dimensions</a><span class="toc-page">§06</span></li>
+      <li><a href="#jacobian">The Jacobian Matrix</a><span class="toc-page">§07</span></li>
+      <li><a href="#synthesis">Synthesis: Why This Matters for AI</a><span class="toc-page">§08</span></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================ -->
+  <!-- 1. PARTIAL DERIVATIVES -->
+  <!-- ============================================ -->
+  <section id="partials">
+    <span class="section-num">§ 01</span>
+    <h2>Partial <em>Derivatives</em></h2>
+    <p class="lede">When a function depends on many variables, the partial derivative asks a simple question — "if I wiggle just one variable, holding all others still, how does the output change?"</p>
+
+    <h3>Formal Definition</h3>
+    <p>For a function <code class="inline">f(x₁, x₂, …, xₙ)</code>, the partial derivative with respect to <code class="inline">xᵢ</code> measures the rate of change of <code class="inline">f</code> when only <code class="inline">xᵢ</code> changes:</p>
+
+    <div class="math">
+      <span class="lbl">Definition</span>
+      ∂f/∂xᵢ = lim<sub>h→0</sub> [ f(x₁, …, xᵢ + h, …, xₙ) − f(x₁, …, xᵢ, …, xₙ) ] / h
+    </div>
+
+    <p>The other variables are treated as constants. This is the simplest possible generalization of the single-variable derivative.</p>
+
+    <div class="intuition">
+      <div class="icon">→ Intuition</div>
+      <p>Imagine standing on a mountain (the function surface). The partial derivative ∂f/∂x is the slope you'd feel if you could only walk strictly east-west. ∂f/∂y is the slope strictly north-south.</p>
+    </div>
+
+    <h3>Worked Example</h3>
+    <p>Let <code class="inline">f(x, y) = x²y + 3y² + xy</code>. Then:</p>
+
+    <div class="math">
+      ∂f/∂x = 2xy + y       (treat y as constant)<br>
+      ∂f/∂y = x² + 6y + x   (treat x as constant)
+    </div>
+
+    <h3>Diagram</h3>
+    <div class="diagram-frame">
+      <svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- Surface contour suggestion -->
+        <defs>
+          <radialGradient id="surface" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fce4d8"/>
+            <stop offset="100%" stop-color="#f4f1ea"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="300" cy="160" rx="250" ry="120" fill="url(#surface)" stroke="#cbc4b4" stroke-width="1"/>
+        <!-- Contour lines -->
+        <ellipse cx="300" cy="160" rx="200" ry="95" fill="none" stroke="#cbc4b4" stroke-width="0.8" stroke-dasharray="3,3"/>
+        <ellipse cx="300" cy="160" rx="140" ry="65" fill="none" stroke="#cbc4b4" stroke-width="0.8" stroke-dasharray="3,3"/>
+        <ellipse cx="300" cy="160" rx="80" ry="40" fill="none" stroke="#cbc4b4" stroke-width="0.8" stroke-dasharray="3,3"/>
+        <!-- Point P -->
+        <circle cx="300" cy="160" r="5" fill="#d94a1f"/>
+        <text x="310" y="155" font-family="Fraunces, serif" font-style="italic" font-size="14" fill="#16151a">P</text>
+        <!-- ∂f/∂x arrow -->
+        <line x1="300" y1="160" x2="430" y2="160" stroke="#d94a1f" stroke-width="2.5" marker-end="url(#arrow1)"/>
+        <text x="370" y="178" font-family="JetBrains Mono, monospace" font-size="13" fill="#d94a1f">∂f/∂x</text>
+        <!-- ∂f/∂y arrow -->
+        <line x1="300" y1="160" x2="300" y2="60" stroke="#1e3a8a" stroke-width="2.5" marker-end="url(#arrow2)"/>
+        <text x="310" y="100" font-family="JetBrains Mono, monospace" font-size="13" fill="#1e3a8a">∂f/∂y</text>
+        <!-- Axes -->
+        <line x1="40" y1="280" x2="560" y2="280" stroke="#16151a" stroke-width="1"/>
+        <line x1="40" y1="280" x2="40" y2="30" stroke="#16151a" stroke-width="1"/>
+        <text x="555" y="298" font-family="JetBrains Mono, monospace" font-size="11" fill="#16151a">x</text>
+        <text x="22" y="40" font-family="JetBrains Mono, monospace" font-size="11" fill="#16151a">y</text>
+        <defs>
+          <marker id="arrow1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#d94a1f"/>
+          </marker>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#1e3a8a"/>
+          </marker>
+        </defs>
+      </svg>
+      <p class="diagram-caption">Contour map of f(x, y). Partial derivatives at P measure slope along the x-axis (red) and y-axis (blue) directions.</p>
+    </div>
+
+    <div class="ai-callout">
+      <h5>How this shows up in AI</h5>
+      <p><strong>Backpropagation IS partial derivatives.</strong> A neural network's loss <code class="inline">L</code> is a function of millions of weights <code class="inline">w₁, w₂, …, wₙ</code>. To update each weight, we need <code class="inline">∂L/∂wᵢ</code> — how the loss changes if we tweak just that one weight.</p>
+      <p>Frameworks like PyTorch compute this for every parameter in your model, on every batch, billions of times during training. The chain rule applied recursively over a computation graph is just partial derivatives, all the way down.</p>
+    </div>
+
+    <h4>PyTorch implementation</h4>
+    <div class="code-block" data-lang="python">
+<span class="kw">import</span> torch
+
+<span class="com"># Two parameters — like a tiny 2-weight model</span>
+x = torch.tensor(<span class="num">2.0</span>, requires_grad=<span class="kw">True</span>)
+y = torch.tensor(<span class="num">3.0</span>, requires_grad=<span class="kw">True</span>)
+
+f = x**<span class="num">2</span> * y + <span class="num">3</span>*y**<span class="num">2</span> + x*y
+f.<span class="fn">backward</span>()
+
+<span class="fn">print</span>(x.grad)  <span class="com"># ∂f/∂x = 2xy + y = 12 + 3 = 15</span>
+<span class="fn">print</span>(y.grad)  <span class="com"># ∂f/∂y = x² + 6y + x = 4 + 18 + 2 = 24</span>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 2. GRADIENT -->
+  <!-- ============================================ -->
+  <section id="gradient">
+    <span class="section-num">§ 02</span>
+    <h2>The Gradient <em>Vector</em></h2>
+    <p class="lede">If partial derivatives are the individual ingredients, the gradient is the recipe — a single vector that bundles them all together and points in the direction of steepest ascent.</p>
+
+    <h3>Formal Definition</h3>
+    <p>The gradient of <code class="inline">f: ℝⁿ → ℝ</code> is the column vector of all its partial derivatives:</p>
+
+    <div class="math">
+      <span class="lbl">Gradient</span>
+      ∇f(x) = [ ∂f/∂x₁, ∂f/∂x₂, …, ∂f/∂xₙ ]ᵀ
+    </div>
+
+    <h3>Two Critical Properties</h3>
+    <ol>
+      <li><strong>Direction:</strong> ∇f points in the direction of <em>steepest ascent</em> at point x. Move along it, f increases fastest. Move opposite to it (−∇f), f decreases fastest.</li>
+      <li><strong>Magnitude:</strong> ‖∇f‖ tells you <em>how steep</em> that ascent is. Where ∇f = 0, you've found a critical point (min, max, or saddle).</li>
+    </ol>
+
+    <div class="diagram-frame">
+      <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bowl" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#d94a1f" stop-opacity="0.15"/>
+          </radialGradient>
+        </defs>
+        <!-- contour rings -->
+        <circle cx="420" cy="170" r="130" fill="url(#bowl)" stroke="#cbc4b4" stroke-dasharray="3,3"/>
+        <circle cx="420" cy="170" r="95" fill="none" stroke="#cbc4b4" stroke-dasharray="3,3"/>
+        <circle cx="420" cy="170" r="60" fill="none" stroke="#cbc4b4" stroke-dasharray="3,3"/>
+        <circle cx="420" cy="170" r="25" fill="none" stroke="#cbc4b4" stroke-dasharray="3,3"/>
+        <circle cx="420" cy="170" r="3" fill="#2d6a3f"/>
+        <text x="430" y="170" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#2d6a3f">minimum</text>
+
+        <!-- Starting point -->
+        <circle cx="120" cy="80" r="6" fill="#16151a"/>
+        <text x="80" y="70" font-family="JetBrains Mono, monospace" font-size="11" fill="#16151a">start</text>
+
+        <!-- Gradient arrows along descent path -->
+        <path d="M 120 80 Q 200 110 260 140" stroke="#d94a1f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+        <path d="M 270 145 Q 320 160 360 165" stroke="#d94a1f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+        <path d="M 365 165 Q 395 168 410 169" stroke="#d94a1f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+
+        <!-- Gradient direction arrow at start -->
+        <line x1="120" y1="80" x2="80" y2="40" stroke="#1e3a8a" stroke-width="2.5" marker-end="url(#a4)"/>
+        <text x="20" y="35" font-family="JetBrains Mono, monospace" font-size="11" fill="#1e3a8a">∇f (ascent)</text>
+        <line x1="120" y1="80" x2="160" y2="120" stroke="#2d6a3f" stroke-width="2.5" stroke-dasharray="4,3" marker-end="url(#a5)"/>
+        <text x="155" y="138" font-family="JetBrains Mono, monospace" font-size="11" fill="#2d6a3f">−∇f (descent)</text>
+
+        <text x="40" y="320" font-family="Fraunces, serif" font-style="italic" font-size="12" fill="#8a8390">A gradient descent trajectory across a loss surface contour map.</text>
+
+        <defs>
+          <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#d94a1f"/>
+          </marker>
+          <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#1e3a8a"/>
+          </marker>
+          <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#2d6a3f"/>
+          </marker>
+        </defs>
+      </svg>
+      <p class="diagram-caption">The gradient ∇f points uphill. Descent moves in the negative gradient direction toward the minimum.</p>
+    </div>
+
+    <p class="pull-quote">"The gradient is the compass needle of optimization — and ML is, fundamentally, optimization."</p>
+
+    <div class="ai-callout">
+      <h5>How this shows up in AI</h5>
+      <p><strong>Gradient descent is the heartbeat of deep learning.</strong> Every optimizer — SGD, Adam, RMSProp, AdamW — starts from the same idea:</p>
+      <div class="math" style="background: rgba(255,255,255,0.5); border-left-color: var(--blue);">
+        w<sub>t+1</sub> = w<sub>t</sub> − η · ∇L(w<sub>t</sub>)
+      </div>
+      <p>Where η is the learning rate and ∇L is the gradient of loss with respect to all parameters. Adam and friends just add momentum, adaptive scaling, and bias correction on top of this skeleton.</p>
+      <p>When people say "the model trained for 100,000 steps," they mean "the parameters were nudged in the −∇L direction 100,000 times."</p>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 3. DIRECTIONAL DERIVATIVES -->
+  <!-- ============================================ -->
+  <section id="directional">
+    <span class="section-num">§ 03</span>
+    <h2>Directional <em>Derivatives</em></h2>
+    <p class="lede">Partials only let you move along axes. Directional derivatives generalize this — they ask, "what's the slope if I walk in <em>any</em> direction?"</p>
+
+    <h3>Formal Definition</h3>
+    <p>For a unit vector <code class="inline">u</code>, the directional derivative of <code class="inline">f</code> at point <code class="inline">x</code> in direction <code class="inline">u</code> is:</p>
+
+    <div class="math">
+      <span class="lbl">Directional Derivative</span>
+      D<sub>u</sub>f(x) = ∇f(x) · u   (dot product)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ‖∇f‖ · ‖u‖ · cos(θ)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ‖∇f‖ · cos(θ)   (since ‖u‖ = 1)
+    </div>
+
+    <p>where θ is the angle between ∇f and u.</p>
+
+    <div class="intuition">
+      <div class="icon">→ Intuition</div>
+      <p>The slope you feel depends on which way you walk:</p>
+      <p>• <strong>θ = 0</strong> — walking along the gradient → maximum ascent (cos = 1).<br>
+         • <strong>θ = 90°</strong> — walking perpendicular to gradient → no change (cos = 0). You're tracing a contour line.<br>
+         • <strong>θ = 180°</strong> — walking against the gradient → maximum descent (cos = −1).</p>
+    </div>
+
+    <h3>Why This Cements the Gradient's Special Role</h3>
+    <p>The directional derivative is maximized when <code class="inline">u</code> aligns with <code class="inline">∇f</code>. This is the formal proof that <em>the gradient is the direction of steepest ascent</em>.</p>
+
+    <div class="ai-callout">
+      <h5>How this shows up in AI</h5>
+      <p><strong>Adversarial examples (FGSM attack).</strong> The Fast Gradient Sign Method crafts an input perturbation that maximally <em>increases</em> the model's loss — moving in the direction of steepest ascent of L with respect to the input x:</p>
+      <div class="math" style="background: rgba(255,255,255,0.5); border-left-color: var(--blue);">
+        x<sub>adv</sub> = x + ε · sign(∇<sub>x</sub> L(θ, x, y))
+      </div>
+      <p><strong>Influence functions and feature attribution</strong> (e.g., gradient saliency maps) ask "in which input direction is the model most sensitive?" — a directional derivative question by design.</p>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 4. HESSIAN -->
+  <!-- ============================================ -->
+  <section id="hessian">
+    <span class="section-num">§ 04</span>
+    <h2>The Hessian <em>Matrix</em></h2>
+    <p class="lede">If the gradient captures slope, the Hessian captures <em>curvature</em>. It's the second derivative — generalized to many dimensions, packaged as a matrix.</p>
+
+    <h3>Formal Definition</h3>
+    <p>For <code class="inline">f: ℝⁿ → ℝ</code>, the Hessian is the n×n matrix of all second partial derivatives:</p>
+
+    <div class="math">
+      <span class="lbl">Hessian Matrix H = ∇²f</span>
+      H<sub>ij</sub> = ∂²f / ∂xᵢ∂xⱼ<br><br>
+      H = ⎡ ∂²f/∂x₁²     ∂²f/∂x₁∂x₂  …  ∂²f/∂x₁∂xₙ ⎤<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;⎢ ∂²f/∂x₂∂x₁  ∂²f/∂x₂²     …  ∂²f/∂x₂∂xₙ ⎥<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;⎢ ⋮            ⋮           ⋱   ⋮          ⎥<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;⎣ ∂²f/∂xₙ∂x₁  ∂²f/∂xₙ∂x₂  …  ∂²f/∂xₙ²     ⎦
+    </div>
+
+    <p><strong>Symmetry (Schwarz's theorem):</strong> If second partials are continuous, <code class="inline">H</code> is symmetric — i.e., <code class="inline">∂²f/∂x∂y = ∂²f/∂y∂x</code>.</p>
+
+    <h3>Worked Example</h3>
+    <p>For <code class="inline">f(x, y) = x²y + 3y²</code>:</p>
+    <div class="math">
+      ∂f/∂x = 2xy,        ∂f/∂y = x² + 6y<br>
+      ∂²f/∂x² = 2y,       ∂²f/∂y² = 6,       ∂²f/∂x∂y = 2x<br><br>
+      H(x,y) = ⎡ 2y   2x ⎤<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⎣ 2x   6  ⎦
+    </div>
+
+    <div class="intuition">
+      <div class="icon">→ Intuition</div>
+      <p>The eigenvalues of the Hessian tell you the curvature along its principal axes:</p>
+      <p>• All eigenvalues <strong>positive</strong> → bowl-shaped (local min).<br>
+         • All eigenvalues <strong>negative</strong> → upside-down bowl (local max).<br>
+         • <strong>Mixed</strong> signs → saddle point.<br>
+         • Some eigenvalues <strong>zero</strong> → flat directions; test is inconclusive.</p>
+    </div>
+
+    <div class="ai-callout">
+      <h5>How this shows up in AI</h5>
+      <p><strong>1. Newton's method &amp; second-order optimization.</strong> Newton's update is <code class="inline">w ← w − H⁻¹∇L</code> — using curvature to take smarter steps than vanilla gradient descent. K-FAC, Shampoo, and Sophia approximate this for deep nets.</p>
+      <p><strong>2. Loss landscape geometry.</strong> The eigenspectrum of the Hessian at a minimum tells us if we're in a sharp or flat valley — flat minima generalize better, a key insight from research on SGD's implicit bias.</p>
+      <p><strong>3. Saddle points dominate, not local minima.</strong> In high-dimensional deep learning losses, almost all critical points are saddles. Understanding when Hessian eigenvalues are mixed-sign explains why SGD's noise helps escape them.</p>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 5. SECOND-ORDER CONDITIONS -->
+  <!-- ============================================ -->
+  <section id="second-order">
+    <span class="section-num">§ 05</span>
+    <h2>Second-Order <em>Conditions</em></h2>
+    <p class="lede">When ∇f = 0, you've found a critical point — but is it a minimum, maximum, or saddle? The Hessian decides.</p>
+
+    <h3>The Test</h3>
+    <p>At a critical point x* (where ∇f(x*) = 0), examine the Hessian H(x*):</p>
+
+    <table>
+      <tr>
+        <th>Hessian property</th>
+        <th>Conclusion</th>
+        <th>Picture</th>
+      </tr>
+      <tr>
+        <td>Positive definite (all eigenvalues > 0)</td>
+        <td><strong>Strict local minimum</strong></td>
+        <td>Bowl ∪</td>
+      </tr>
+      <tr>
+        <td>Negative definite (all eigenvalues < 0)</td>
+        <td><strong>Strict local maximum</strong></td>
+        <td>Inverted bowl ∩</td>
+      </tr>
+      <tr>
+        <td>Indefinite (mixed signs)</td>
+        <td><strong>Saddle point</strong></td>
+        <td>Pringle chip 🥨</td>
+      </tr>
+      <tr>
+        <td>Positive/negative semidefinite (some zero eigenvalues)</td>
+        <td>Test is <em>inconclusive</em>; need higher-order analysis</td>
+        <td>Flat ridge or trough</td>
+      </tr>
+    </table>
+
+    <h3>2D Quick Test</h3>
+    <p>For <code class="inline">f(x, y)</code>, define the determinant <code class="inline">D = f<sub>xx</sub>·f<sub>yy</sub> − (f<sub>xy</sub>)²</code>:</p>
+    <ul>
+      <li>D > 0 and f<sub>xx</sub> > 0 → local min</li>
+      <li>D > 0 and f<sub>xx</sub> < 0 → local max</li>
+      <li>D < 0 → saddle point</li>
+      <li>D = 0 → inconclusive</li>
+    </ul>
+
+    <div class="diagram-frame">
+      <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg">
+        <!-- Three mini surfaces -->
+        <!-- Min -->
+        <g transform="translate(50, 30)">
+          <path d="M 10 130 Q 75 30 140 130" stroke="#2d6a3f" stroke-width="2.5" fill="none"/>
+          <circle cx="75" cy="120" r="4" fill="#d94a1f"/>
+          <text x="50" y="170" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#16151a">Min — H ≻ 0</text>
+        </g>
+        <!-- Max -->
+        <g transform="translate(225, 30)">
+          <path d="M 10 30 Q 75 130 140 30" stroke="#1e3a8a" stroke-width="2.5" fill="none"/>
+          <circle cx="75" cy="40" r="4" fill="#d94a1f"/>
+          <text x="50" y="170" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#16151a">Max — H ≺ 0</text>
+        </g>
+        <!-- Saddle -->
+        <g transform="translate(400, 30)">
+          <path d="M 10 130 Q 75 30 140 130" stroke="#d94a1f" stroke-width="2.5" fill="none" stroke-dasharray="3,3"/>
+          <path d="M 10 30 Q 75 130 140 30" stroke="#d94a1f" stroke-width="2.5" fill="none"/>
+          <circle cx="75" cy="80" r="4" fill="#16151a"/>
+          <text x="40" y="170" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#16151a">Saddle — H indefinite</text>
+        </g>
+      </svg>
+      <p class="diagram-caption">Three faces of a critical point — distinguishable only by the Hessian's eigenvalue signs.</p>
+    </div>
+
+    <div class="ai-callout">
+      <h5>How this shows up in AI</h5>
+      <p><strong>The "saddle point problem"</strong> is one of deep learning's central drama-stories. In high-dim loss landscapes, the chance that all eigenvalues happen to be the same sign at a critical point shrinks exponentially with dimension — so saddles vastly outnumber actual minima. SGD's stochastic noise is essentially a saddle-escape mechanism.</p>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 6. TAYLOR EXPANSION -->
+  <!-- ============================================ -->
+  <section id="taylor">
+    <span class="section-num">§ 06</span>
+    <h2>Taylor Expansion in <em>Multiple Dimensions</em></h2>
+    <p class="lede">Local approximation is everything. Taylor expansion lets you replace a horrifyingly complex function with a friendly polynomial — accurate near a chosen point.</p>
+
+    <h3>The Formula</h3>
+    <p>Around point <code class="inline">a</code>, with displacement <code class="inline">Δx = x − a</code>:</p>
+
+    <div class="math">
+      <span class="lbl">Multivariate Taylor (2nd order)</span>
+      f(x) ≈ f(a) + ∇f(a)ᵀ Δx + ½ Δxᵀ H(a) Δx + O(‖Δx‖³)
+    </div>
+
+    <p>Three pieces, each linguistically meaningful:</p>
+    <ol>
+      <li><strong>f(a)</strong> — the constant value at the anchor point.</li>
+      <li><strong>∇f(a)ᵀ Δx</strong> — the linear correction (slope × displacement).</li>
+      <li><strong>½ Δxᵀ H(a) Δx</strong> — the quadratic correction (curvature).</li>
+    </ol>
+
+    <h3>Why It Matters</h3>
+    <p>Almost every optimization algorithm is built on local quadratic approximation:</p>
+    <ul>
+      <li><strong>Gradient descent</strong> uses the linear (1st-order) Taylor term, picking the descent direction.</li>
+      <li><strong>Newton's method</strong> uses the full quadratic (2nd-order) Taylor and jumps directly to the minimum of the local parabola: <code class="inline">Δx* = −H⁻¹∇f</code>.</li>
+      <li><strong>Trust region methods</strong> trust the quadratic approximation only within a ball of radius δ.</li>
+    </ul>
+
+    <div class="intuition">
+      <div class="icon">→ Intuition</div>
+      <p>Near any smooth point, every function looks like a tilted, curved bowl. Taylor expansion is the lens that makes that bowl mathematically explicit.</p>
+    </div>
+
+    <div class="ai-callout">
+      <h5>How this shows up in AI</h5>
+      <p><strong>1. Loss landscape sharpness.</strong> The 2nd-order Taylor term <code class="inline">½Δwᵀ H Δw</code> is exactly what "sharpness" measures. Sharpness-Aware Minimization (SAM) optimizers explicitly penalize this term to find flatter minima.</p>
+      <p><strong>2. Catastrophic forgetting (EWC).</strong> Elastic Weight Consolidation uses a Taylor approximation of the loss around old-task weights to add a quadratic penalty: <code class="inline">L<sub>new</sub> + λ·(w − w*)ᵀ F (w − w*)</code>, where F is the Fisher information (Hessian-like). Pure Taylor in disguise.</p>
+      <p><strong>3. Neural Tangent Kernels.</strong> NTK theory shows wide nets behave like their first-order Taylor expansion around initialization — turning training into linear regression on a fixed feature map.</p>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 7. JACOBIAN -->
+  <!-- ============================================ -->
+  <section id="jacobian">
+    <span class="section-num">§ 07</span>
+    <h2>The Jacobian <em>Matrix</em></h2>
+    <p class="lede">Up to now we've considered functions f: ℝⁿ → ℝ — many inputs, one output. The Jacobian generalizes to vector-valued functions f: ℝⁿ → ℝᵐ, which is what every layer of a neural network actually is.</p>
+
+    <h3>Formal Definition</h3>
+    <p>For <code class="inline">f(x) = (f₁(x), f₂(x), …, f<sub>m</sub>(x))</code>, the Jacobian is the m×n matrix:</p>
+
+    <div class="math">
+      <span class="lbl">Jacobian J = ∂f/∂x</span>
+      J<sub>ij</sub> = ∂f<sub>i</sub> / ∂x<sub>j</sub><br><br>
+      J = ⎡ ∂f₁/∂x₁  ∂f₁/∂x₂  …  ∂f₁/∂xₙ ⎤<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;⎢ ∂f₂/∂x₁  ∂f₂/∂x₂  …  ∂f₂/∂xₙ ⎥<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;⎢ ⋮         ⋮         ⋱   ⋮         ⎥<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;⎣ ∂f<sub>m</sub>/∂x₁  ∂f<sub>m</sub>/∂x₂  …  ∂f<sub>m</sub>/∂xₙ ⎦
+    </div>
+
+    <h3>Shape Intuition</h3>
+    <table>
+      <tr>
+        <th>Function shape</th>
+        <th>Derivative object</th>
+        <th>Shape</th>
+      </tr>
+      <tr><td>f: ℝ → ℝ</td><td>scalar derivative</td><td>1×1</td></tr>
+      <tr><td>f: ℝⁿ → ℝ</td><td>gradient ∇f</td><td>1×n (or n×1)</td></tr>
+      <tr><td>f: ℝⁿ → ℝᵐ</td><td>Jacobian J</td><td>m×n</td></tr>
+      <tr><td>f: ℝⁿ → ℝ (2nd deriv)</td><td>Hessian H</td><td>n×n</td></tr>
+    </table>
+
+    <p><strong>Special case:</strong> when m = 1, the Jacobian is just the gradient (transposed). The gradient is a special Jacobian.</p>
+
+    <h3>Multivariable Chain Rule</h3>
+    <p>This is the heart of backprop. If <code class="inline">y = f(g(x))</code>, then:</p>
+    <div class="math">
+      <span class="lbl">Chain Rule (vector form)</span>
+      ∂y/∂x = J<sub>f</sub>(g(x)) · J<sub>g</sub>(x)
+    </div>
+    <p>The Jacobians multiply together — exactly how a neural network's gradients flow backward layer by layer.</p>
+
+    <div class="ai-callout">
+      <h5>How this shows up in AI</h5>
+      <p><strong>1. Every neural network layer is a vector-valued function.</strong> Layer i takes activation aᵢ₋₁ (a vector) and produces aᵢ (another vector). Its Jacobian ∂aᵢ/∂aᵢ₋₁ is what gets multiplied in backprop.</p>
+      <p><strong>2. Vanishing/exploding gradients</strong> happen when the product of Jacobian norms across layers shrinks to zero or blows up. Spectral norm regularization, residual connections, and careful initialization all aim to control Jacobian magnitudes.</p>
+      <p><strong>3. Normalizing flows.</strong> Models like RealNVP and Glow rely on the change-of-variables formula, which requires computing <code class="inline">log|det J|</code> for invertible transformations. The Jacobian determinant tells you how the model squeezes or stretches probability density.</p>
+      <p><strong>4. Jacobian-vector products (JVPs) and vector-Jacobian products (VJPs)</strong> are the primitives behind PyTorch's <code class="inline">autograd</code> and JAX's <code class="inline">grad</code>. Forward-mode AD = JVP; reverse-mode AD (used in training) = VJP.</p>
+    </div>
+
+    <h4>JAX Jacobian computation</h4>
+    <div class="code-block" data-lang="python">
+<span class="kw">import</span> jax
+<span class="kw">import</span> jax.numpy <span class="kw">as</span> jnp
+
+<span class="kw">def</span> <span class="fn">f</span>(x):
+    <span class="com"># f: ℝ³ → ℝ²</span>
+    <span class="kw">return</span> jnp.array([
+        x[<span class="num">0</span>]**<span class="num">2</span> + x[<span class="num">1</span>],
+        x[<span class="num">1</span>] * x[<span class="num">2</span>]
+    ])
+
+x = jnp.array([<span class="num">1.0</span>, <span class="num">2.0</span>, <span class="num">3.0</span>])
+
+J = jax.<span class="fn">jacrev</span>(f)(x)
+<span class="com"># J = [[2x₀, 1, 0],</span>
+<span class="com">#      [0,  x₂, x₁]]</span>
+<span class="com"># J = [[2, 1, 0],</span>
+<span class="com">#      [0, 3, 2]]</span>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- 8. SYNTHESIS -->
+  <!-- ============================================ -->
+  <section id="synthesis">
+    <span class="section-num">§ 08</span>
+    <h2>Synthesis: Why <em>This Matters</em> for AI</h2>
+    <p class="lede">A single mental model: training a neural network is just multivariable calculus, executed billions of times.</p>
+
+    <h3>The Master Equation</h3>
+    <p>Boil all of deep learning training to its skeleton:</p>
+    <div class="math" style="font-size: 1.05rem; padding: 24px;">
+      <span class="lbl">The Loop</span>
+      <strong>θ<sub>t+1</sub> = θ<sub>t</sub> − η · ∇<sub>θ</sub> L(θ<sub>t</sub>; D)</strong>
+    </div>
+
+    <p>Decoded:</p>
+    <ul>
+      <li><strong>θ</strong> — millions of parameters (weights and biases). High-dim ℝⁿ.</li>
+      <li><strong>L</strong> — scalar loss function. ℝⁿ → ℝ.</li>
+      <li><strong>∇L</strong> — gradient: a vector pointing toward higher loss. We negate it to descend.</li>
+      <li><strong>Computation of ∇L</strong> — backprop, which is the chain rule applied to a stack of Jacobians (one per layer).</li>
+      <li><strong>Step size choice</strong> — implicitly governed by curvature (Hessian); adaptive optimizers approximate this.</li>
+      <li><strong>Generalization quality</strong> — partly controlled by the Hessian eigenspectrum at the chosen minimum (sharpness vs flatness).</li>
+    </ul>
+
+    <h3>Quick Reference Table</h3>
+    <table>
+      <tr>
+        <th>Concept</th>
+        <th>What it captures</th>
+        <th>AI manifestation</th>
+      </tr>
+      <tr>
+        <td>Partial derivative</td>
+        <td>Per-axis slope</td>
+        <td>Per-weight gradient ∂L/∂wᵢ</td>
+      </tr>
+      <tr>
+        <td>Gradient ∇f</td>
+        <td>Direction of steepest ascent</td>
+        <td>Optimizer step direction</td>
+      </tr>
+      <tr>
+        <td>Directional derivative</td>
+        <td>Slope in arbitrary direction</td>
+        <td>Adversarial attacks, saliency</td>
+      </tr>
+      <tr>
+        <td>Hessian H</td>
+        <td>Curvature in all directions</td>
+        <td>Newton-style optimizers, sharpness</td>
+      </tr>
+      <tr>
+        <td>Second-order conditions</td>
+        <td>Min vs max vs saddle</td>
+        <td>Saddle escape problem in deep nets</td>
+      </tr>
+      <tr>
+        <td>Taylor expansion</td>
+        <td>Local polynomial approximation</td>
+        <td>SAM, EWC, NTK theory</td>
+      </tr>
+      <tr>
+        <td>Jacobian J</td>
+        <td>Vector → vector derivative</td>
+        <td>Layer-wise backprop, normalizing flows</td>
+      </tr>
+    </table>
+
+    <p class="pull-quote">"Deep learning is calculus that fits on a GPU."</p>
+  </section>
+
+  <footer>
+    <span>Notes · v1.0</span>
+    <span>Multivariable Calculus → AI</span>
+    <span>Week 01</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
